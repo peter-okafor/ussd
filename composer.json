@@ -1,9 +1,13 @@
 {
-    "name": "tnmdev/ussd",
+    "name": "okaforpeter/ussd",
     "description": "USSD Adaptor for Laravel PHP",
     "type": "library",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Peter Okafor",
+            "email": "peter.obinna.okafor@gmail.com"
+        },
         {
             "name": "TNM Developers",
             "email": "developers@tnm.co.mw"
