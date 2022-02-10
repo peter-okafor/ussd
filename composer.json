@@ -7,10 +7,6 @@
         {
             "name": "Peter Okafor",
             "email": "peter.obinna.okafor@gmail.com"
-        },
-        {
-            "name": "TNM Developers",
-            "email": "developers@tnm.co.mw"
         }
     ],
     "minimum-stability": "dev",
