@@ -113,7 +113,11 @@ abstract class Screen
      */
     public function hasPayload(string $key): bool
     {
-        return !empty($this->payload($key));
+        try {
+            return !empty($this->payload($key));
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
