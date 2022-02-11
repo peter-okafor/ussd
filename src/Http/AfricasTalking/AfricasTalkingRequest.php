@@ -3,7 +3,6 @@ namespace TNM\USSD\Http\AfricasTalking;
 
 use TNM\USSD\Http\Request;
 use TNM\USSD\Http\UssdRequestInterface;
-use TNM\USSD\Models\Session;
 
 class AfricasTalkingRequest implements UssdRequestInterface
 {
@@ -29,7 +28,7 @@ class AfricasTalkingRequest implements UssdRequestInterface
 
 	public function getType() : int
 	{
-		return Session::findBySessionId($this->getSession())->exists() ? Request::RESPONSE : Request::INITIAL;
+		return $this->request['text'] ? Request::RESPONSE : Request::INITIAL;
 	}
 
 	public function getMessage() : string
