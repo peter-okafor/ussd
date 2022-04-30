@@ -26,6 +26,10 @@ class EntryScreenFactory
 
         if ($this->request->toPreviousScreen()) return $this->request->getPreviousScreen()->render();
 
+        if ($this->request->toNextScreen()) return $this->request->getNextScreen()->render(); // return $this->request->getScreen()->render();
+
+        if ($this->request->toBackScreen()) return $this->request->getBackScreen()->render();
+
         if ($this->request->getScreen()->outOfRange()) return $this->request->getScreen()->render();
 
         return Screen::handle($this->request);
