@@ -2,5 +2,7 @@
 
 return [
     'back' => 'Back',
-    'home' => 'Home'
+    'home' => 'Home',
+    'previous' => 'Previous',
+    'next' => 'Next',
 ];

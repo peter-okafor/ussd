@@ -52,7 +52,11 @@ abstract class AbstractSession extends Model
 
     public function getPayload(string $key)
     {
-        return $this->payload()->where('key', $key)->latest()->first()->{'value'};
+        try {
+            return $this->payload()->where('key', $key)->latest()->first()->{'value'};
+        } catch (\Throwable $th) {
+            return null;
+        }
     }
 
     public function getPayloads(): Collection

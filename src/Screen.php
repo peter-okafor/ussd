@@ -16,6 +16,8 @@ abstract class Screen
 {
     const PREVIOUS = '98';
     const HOME = '99';
+    const BACK = '96';
+    const NEXT = '97';
     /**
      * USSD Request object
      *
@@ -163,6 +165,33 @@ abstract class Screen
     }
 
     /**
+     * Return the selected output string page
+     *
+     * @return string
+     */
+    protected function optionsStringPage(int $page, int $characters): array
+    {
+        $pages = [];
+        $string = '';
+
+        for ($i = 0; $i < count($this->options()); $i++) {
+            $addition = sprintf("%s. %s\n", $i + 1, $this->options()[$i]);
+
+            if (strlen($string.$addition) < $characters) {
+                $string .= $addition;
+            } else {
+                $pages[] = $string;
+                $string = $addition;
+            }
+        }
+
+        return [
+            'page' => $pages[$page - 1] ?? $pages[array_key_last($pages)],
+            'is_last_page' => count($pages) === $page
+        ];
+    }
+
+    /**
      * Retrieve the value passed with the USSD response
      *
      * @return string
@@ -177,6 +206,21 @@ abstract class Screen
     protected function goesBack(): bool
     {
         return $this->type() === Response::RESPONSE;
+    }
+
+    /**
+     * Check if the message and options is greater than the max length
+     *
+     * @return bool
+     */
+    protected function greaterThanMaxLength(): bool
+    {
+        return strlen(
+            $this->message() . 
+            $this->optionsAsString() . 
+            $this->nextPrevious() .
+            ($this->goesBack() ? $this->nav() : '')
+        ) > config('ussd.character_limit');
     }
 
     /**
@@ -228,6 +272,7 @@ abstract class Screen
     public function inOptions(string $value): bool
     {
         if ($value == static::HOME || $value == static::PREVIOUS) return true;
+        if ($value == static::BACK || $value == static::NEXT) return true;
         if (!is_numeric($value)) return false;
         return array_key_exists($value - 1, $this->options());
     }
@@ -247,9 +292,48 @@ abstract class Screen
         ) : "";
     }
 
+    private function nextPrevious(): string
+    {
+        return sprintf("%s %s \n%s %s\n",
+            Screen::BACK,
+            __("ussd::nav.previous"),
+            Screen::NEXT,
+            __("ussd::nav.next")
+        );
+    }
+
     public function getResponseMessage(): string
     {
-        return sprintf("%s\n%s%s", $this->message(), $this->optionsAsString(), $this->nav());
+        $option = '';
+        
+        if ($this->greaterThanMaxLength()) {
+            $page = $this->request->trail->getPayload(get_class($this).'current_page') ??  0;
+            $is_last_page = false;
+
+            if (!$page) {
+                $this->request->trail->addPayload(get_class($this).'current_page', 1);
+                $page = 1;
+            }  else {
+                if ($this->request->toNextScreen()) {
+                    $page = $page + 1;
+                }
+    
+                if ($this->request->toBackScreen()) {
+                    $page = ($page - 1 == 0) ? 1 : $page - 1;
+                }
+            }
+
+            $option = $this->optionsStringPage($page, config('ussd.character_limit'));
+
+            $is_last_page = $option['is_last_page'];
+            $option = $option['page'];
+
+            $this->request->trail->addPayload(get_class($this).'current_page', ($is_last_page ? 0 : $page));
+        } else{
+            $option = $this->optionsAsString();
+        }
+
+        return sprintf("%s\n%s%s%s", $this->message(), $option, ($this->greaterThanMaxLength() ? $this->nextPrevious() : ''), $this->nav());
     }
 
     private function makeTrail(): void

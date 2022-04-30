@@ -45,6 +45,16 @@ class Request extends BaseRequest
         return $this->message == Screen::PREVIOUS;
     }
 
+    public function toNextScreen(): bool
+    {
+        return $this->message == Screen::NEXT;
+    }
+
+    public function toBackScreen(): bool
+    {
+        return $this->message == Screen::BACK;
+    }
+
     public function toHomeScreen(): bool
     {
         if ($this->getExistingSession()) return false;
@@ -143,6 +153,20 @@ class Request extends BaseRequest
     public function getPreviousScreen(): Screen
     {
         return $this->getScreen()->previous();
+    }
+
+    public function getNextScreen(): Screen
+    {
+        $currentPage = $this->trail->getPayload('current_page') ?? 1;
+        $this->trail->addPayload('current_page', $currentPage + 1);
+        return $this->getScreen();
+    }
+
+    public function getBackScreen(): Screen
+    {
+        $currentPage = $this->trail->getPayload('current_page') ?? 1;
+        $this->trail->addPayload('current_page', $currentPage - 1 > 0 ? $currentPage - 1 : 1);
+        return $this->getScreen();
     }
 
     public function getExistingSession(): ?Session
