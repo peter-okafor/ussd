@@ -285,10 +285,10 @@ abstract class Screen
     private function nav(): string
     {
         return $this->goesBack() ? sprintf("%s %s \n%s %s",
+            Screen::PREVIOUS,
+            __("ussd::nav.back"),
             Screen::HOME,
             __("ussd::nav.home"),
-            Screen::PREVIOUS,
-            __("ussd::nav.back")
         ) : "";
     }
 
