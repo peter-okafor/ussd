@@ -172,22 +172,36 @@ abstract class Screen
     protected function optionsStringPage(int $page, int $characters): array
     {
         $pages = [];
-        $string = '';
+        $summationOfStrings = '';
+
+        $currentDisplayCount = strlen($this->nextPrevious()) + strlen($this->nav()) + strlen($this->message());
+
+        $optionAllowedCharacters = $characters - $currentDisplayCount;
+
+        $test = [];
 
         for ($i = 0; $i < count($this->options()); $i++) {
-            $addition = sprintf("%s. %s\n", $i + 1, $this->options()[$i]);
+            $singleStringifiedOption = sprintf("%s. %s\n", $i + 1, $this->options()[$i]);
 
-            if (strlen($string.$addition) < $characters) {
-                $string .= $addition;
+            $projectedSummationOfStrings = strlen($summationOfStrings.$singleStringifiedOption);
+
+            if (
+                $projectedSummationOfStrings <= $optionAllowedCharacters
+            ) {
+                $summationOfStrings .= $singleStringifiedOption;
             } else {
-                $pages[] = $string;
-                $string = $addition;
+                $pages[] = $summationOfStrings;
+                $summationOfStrings = $singleStringifiedOption;
             }
+
+            $test[] = $projectedSummationOfStrings;
         }
 
+        $pages[] = $summationOfStrings;
+
         return [
-            'page' => $pages[$page - 1] ?? $pages[array_key_last($pages)],
-            'is_last_page' => count($pages) === $page
+            'page' => $pages[$page] ?? $pages[array_key_last($pages)],
+            'is_last_page' => count($pages) === $page + 1
         ];
     }
 
@@ -307,20 +321,15 @@ abstract class Screen
         $option = '';
         
         if ($this->greaterThanMaxLength()) {
-            $page = $this->request->trail->getPayload(get_class($this).'current_page') ??  0;
-            $is_last_page = false;
+            $page = $this->request->trail->getPayload(get_class($this).'current_page') ?? 0;
+            
+            if ($this->request->toNextScreen()) {
+                $page = $page + 1;
+            }
 
-            if (!$page) {
-                $this->request->trail->addPayload(get_class($this).'current_page', 1);
-                $page = 1;
-            }  else {
-                if ($this->request->toNextScreen()) {
-                    $page = $page + 1;
-                }
-    
-                if ($this->request->toBackScreen()) {
-                    $page = ($page - 1 == 0) ? 1 : $page - 1;
-                }
+            if ($this->request->toBackScreen()) {
+                $page = $page - 1;
+                $page  = $page < 0 ? 0 : $page;
             }
 
             $option = $this->optionsStringPage($page, config('ussd.character_limit'));
