@@ -17,6 +17,8 @@ class RequestFactory
                 return resolve(FlaresRequest::class);
             case 'africastalking' :
                 return resolve(AfricasTalkingRequest::class);
+            case 'hollatags' :
+                return resolve(HollaTagsRequest::class);
             default:
                 return resolve(TruRouteRequest::class);
         }
