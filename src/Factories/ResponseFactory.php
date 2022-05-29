@@ -18,6 +18,8 @@ class ResponseFactory
                 return resolve(FlaresResponse::class);
             case 'africastalking':
                 return resolve(AfricasTalkingResponse::class);
+            case 'hollatags':
+                return resolve(HollaTagsResponse::class);
             default:
                 return resolve(TruRouteResponse::class);
         }
