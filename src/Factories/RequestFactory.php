@@ -6,6 +6,7 @@ namespace TNM\USSD\Factories;
 use TNM\USSD\Http\AfricasTalking\AfricasTalkingRequest;
 use TNM\USSD\Http\Flares\FlaresRequest;
 use TNM\USSD\Http\TruRoute\TruRouteRequest;
+use TNM\USSD\Http\HollaTags\HollaTagsRequest;
 use TNM\USSD\Http\UssdRequestInterface;
 
 class RequestFactory
