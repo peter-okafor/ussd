@@ -13,7 +13,7 @@ class HollaTagsResponse implements UssdResponseInterface
 		$response['session_id'] = $screen->request->getSession();
 		$response['session_operation'] = $screen->type() == Response::RESPONSE ? 'continue' : 'end';
 		$response['session_msg'] = $screen->getResponseMessage();
-		$response['type'] = $screen->type() == Response::RESPONSE ? 1 : 4;
+		$response['session_type'] = $screen->type() == Response::RESPONSE ? 1 : 4;
 
 		return json_encode($response);
     }
